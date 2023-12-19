@@ -11,8 +11,6 @@ import (
 
 func GenerateDetailsOverviewView(app *tview.Application, call calls.Call) tview.Primitive {
 	list := tview.NewList()
-	list.SetBorder(true).SetTitle(fmt.Sprintf(" %s - Call Record ", call.Name)) // Optional: Adjust or remove
-	list.SetBorderPadding(0, 0, 0, 0)
 	list.SetSecondaryTextColor(tcell.Color39)
 	list.SetSelectedFunc(func(index int, mainText string, secondaryText string, shortcut rune) {
 		detailsView := GenerateDetailedRequestView(app, call, call.Requests[len(call.Requests)-index-1])
@@ -49,6 +47,24 @@ func GenerateDetailsOverviewView(app *tview.Application, call calls.Call) tview.
 		return newCall
 	})
 
+	averageDelay := call.AverageRequestDelay()
+	var formattedDelay string
+
+	if averageDelay.Seconds() < 60 {
+		formattedDelay = fmt.Sprintf("%.1f seconds", averageDelay.Seconds())
+	} else {
+		formattedDelay = fmt.Sprintf("%.1f minutes", averageDelay.Minutes())
+	}
+	callInfoView := tview.NewTextView().SetText(fmt.Sprintf("%s - Call Record\nURL ID: %s\nFrequency: %s", call.Name, call.ID, formattedDelay))
+
+	grid := tview.NewGrid().
+		SetRows(0).         // One row that takes up all vertical space
+		SetColumns(-1, -2). // Two columns: -2 (2/3 of the width), -1 (1/3 of the width)
+		SetBorders(true)    // Optional: adds borders for visualization
+
+	grid.AddItem(callInfoView, 0, 0, 1, 1, 0, 0, false)
+	grid.AddItem(list, 0, 1, 1, 1, 0, 0, false)
+
 	// InputField for command input.
 	labelColorFocused := tcell.Color39
 	labelColorBlurred := tcell.Color57
@@ -80,7 +96,7 @@ func GenerateDetailsOverviewView(app *tview.Application, call calls.Call) tview.
 	// Layout for our app.
 	primaryAppLayout := tview.NewFlex().
 		SetDirection(tview.FlexRow).
-		AddItem(list, 0, 1, false).
+		AddItem(grid, 0, 1, false).
 		AddItem(inputField, 1, 1, true)
 
 	// Handle Key Presses & Controls

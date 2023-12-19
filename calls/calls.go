@@ -21,6 +21,24 @@ type Call struct {
 	LastPhone  time.Time
 }
 
+func (c Call) AverageRequestDelay() time.Duration {
+	if len(c.Requests) < 2 {
+		return 0
+	}
+
+	var totalDelay time.Duration
+	var count int
+
+	for i := 1; i < len(c.Requests); i++ {
+		delay := c.Requests[i].Time.Sub(c.Requests[i-1].Time)
+		totalDelay += delay
+		count++
+	}
+
+	averageDelay := totalDelay / time.Duration(count)
+	return averageDelay
+}
+
 var Calls []Call
 
 func GetCall(id string) (Call, error) {
