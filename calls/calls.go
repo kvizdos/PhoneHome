@@ -1,24 +1,70 @@
 package calls
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"time"
 )
 
 type Request struct {
-	UserAgent  string
-	Data       string
-	Time       time.Time
-	HTTPMethod string
+	UserAgent  string    `json:"userAgent"`
+	Data       string    `json:"data"`
+	Time       time.Time `json:"time"`
+	HTTPMethod string    `json:"method"`
+}
+
+func (r Request) Marshal() []byte {
+	js, _ := json.Marshal(r)
+	return js
+}
+
+func (r Request) DumpDataToFile(callName string, outPath string) error {
+	f, err := os.Create(fmt.Sprintf("%s/data-%s-%s-%s.json", outPath, callName, r.HTTPMethod, r.Time))
+	if err != nil {
+		return err
+	}
+
+	_, err = f.Write([]byte(r.Data))
+	return err
+}
+
+func (r Request) DumpToFile(callName string, outPath string) error {
+	f, err := os.Create(fmt.Sprintf("%s/%s-%s-%s.json", outPath, callName, r.HTTPMethod, r.Time))
+	if err != nil {
+		return err
+	}
+
+	js, _ := json.MarshalIndent(r, "", "\t")
+
+	_, err = f.Write(js)
+	return err
+}
+
+func (r Request) DumpToUglyFile(callName string, outPath string) error {
+	f, err := os.Create(fmt.Sprintf("%s/ugly-%s-%s-%s.json", outPath, callName, r.HTTPMethod, r.Time))
+	if err != nil {
+		return err
+	}
+
+	js := r.Marshal()
+
+	_, err = f.Write(js)
+	return err
 }
 
 type Call struct {
-	Name       string
-	Index      int
-	ID         string
-	Unanswered bool
-	Requests   []Request
-	LastPhone  time.Time
+	Name       string    `json:"name"`
+	Index      int       `json:"-"`
+	ID         string    `json:"-"`
+	Unanswered bool      `json:"-"`
+	Requests   []Request `json:"requests"`
+	LastPhone  time.Time `json:"-"`
+}
+
+func (c Call) Marshal() []byte {
+	js, _ := json.Marshal(c)
+	return js
 }
 
 func (c Call) AverageRequestDelay() time.Duration {

@@ -57,6 +57,24 @@ func GenerateDetailedRequestView(app *tview.Application, call calls.Call, reques
 				app.SetRoot(GenerateDetailsOverviewView(app, call), true)
 				return
 			}
+			if command == "dump data" {
+				err := request.DumpDataToFile(call.Name, ".")
+				if err != nil {
+					// handle
+				}
+			}
+			if command == "dump" {
+				err := request.DumpToFile(call.Name, ".")
+				if err != nil {
+					// handle
+				}
+			}
+			if command == "dump ugly" {
+				err := request.DumpToUglyFile(call.Name, ".")
+				if err != nil {
+					// handle
+				}
+			}
 			// Clear input field and focus on it again.
 			inputField.SetText("")
 			app.SetFocus(inputField)

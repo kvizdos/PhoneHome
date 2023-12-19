@@ -37,3 +37,11 @@ Simply type `new <listener name>` and hit enter. Once you do, you'll see a uniqu
 ## Mark an Event as Read
 
 Hover over the listener you want to mark as read, and click `r` (make sure you're focused on the list by hitting escape)
+
+## Dumping Data
+
+You have three methods of dumping data from a request. Note: you must be within the detailed view of a request, where the data is visible.
+
+1. `dump`: dumps a json-pretty string to a file with the entire request saved
+2. `dump data`: dumps only the data field to a json file
+3. `dump ugly`: dumps an ugly json string (no indents) to a file with the entire request saved
